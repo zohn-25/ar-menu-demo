@@ -7,10 +7,9 @@
     <title>AR Menu</title>
 
     <!-- A-Frame + MindAR -->
-
-
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+
     <style>
         body,
         html {
@@ -23,6 +22,11 @@
             width: 100vw;
             height: 100vh;
         }
+
+        /* ensure video respects its aspect ratio */
+        a-video {
+            object-fit: contain;
+        }
     </style>
 </head>
 
@@ -31,21 +35,47 @@
         <a-scene mindar-image="imageTargetSrc: ./targets/menu.mind;" color-space="sRGB"
             renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false"
             device-orientation-permission-ui="enabled: true">
-            <!-- ✅ A-Assets must be inside A-Scene -->
+
+            <!-- ✅ A-Assets -->
             <a-assets>
-                <video id="menuVideo" src="./assets/garden boys.mp4" preload="auto" loop crossorigin="anonymous" muted autoplay
-                    playsinline></video>
+                <!-- Multiple sources for browser support -->
+                <video id="menuVideo" preload="auto" loop muted autoplay playsinline crossorigin="anonymous">
+                    <source src="./assets/menu.m4v" type="video/mp4"> <!-- some browsers accept m4v -->
+                    <source src="./assets/garden boys.mp4" type="video/mp4"> <!-- guaranteed fallback -->
+                    <source src="./assets/menu.webm" type="video/webm"> <!-- optional extra fallback -->
+                    Your browser does not support the video tag.
+                </video>
             </a-assets>
 
             <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-            <!-- Target 0 = menu marker -->
+            <!-- Target marker -->
             <a-entity mindar-image-target="targetIndex: 0">
-                <a-video src="#menuVideo" width="1.6" height="0.9" position="0 0 0" rotation="0 0 0"></a-video>
+                <!-- keep ratio by adjusting height dynamically via script -->
+                <a-video id="menuVideoPlane" src="#menuVideo" width="1" height="0.5625" position="0 0 0"
+                    rotation="0 0 0">
+                </a-video>
             </a-entity>
         </a-scene>
     </div>
-</body>
 
+    <script>
+        // ✅ Keep original video aspect ratio
+        const video = document.getElementById('menuVideo');
+        const videoPlane = document.getElementById('menuVideoPlane');
+
+        video.addEventListener('loadedmetadata', () => {
+            const aspect = video.videoWidth / video.videoHeight;
+            videoPlane.setAttribute('width', 1); // base width
+            videoPlane.setAttribute('height', 1 / aspect); // auto height
+        });
+
+        // ✅ Ensure autoplay works
+        video.play().catch(() => {
+            console.warn("Autoplay blocked. Waiting for user interaction...");
+            document.body.addEventListener("click", () => video.play(), { once: true });
+        });
+    </script>
+</body>
 
 </html>
