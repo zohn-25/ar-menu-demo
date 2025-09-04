@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AR Menu</title>
+
+    <!-- A-Frame + MindAR -->
+
+
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        #ar-container {
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="ar-container">
+        <a-scene mindar-image="imageTargetSrc: ./targets/menu.mind;" color-space="sRGB"
+            renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false"
+            device-orientation-permission-ui="enabled: true">
+            <!-- ✅ A-Assets must be inside A-Scene -->
+            <a-assets>
+                <video id="menuVideo" src="./assets/garden boys.mp4" preload="auto" loop crossorigin="anonymous" muted autoplay
+                    playsinline></video>
+            </a-assets>
+
+            <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+            <!-- Target 0 = menu marker -->
+            <a-entity mindar-image-target="targetIndex: 0">
+                <a-video src="#menuVideo" width="100%" height="auto" position="0 0 0" rotation="0 0 0"></a-video>
+            </a-entity>
+        </a-scene>
+    </div>
+</body>
+
+
+</html>
